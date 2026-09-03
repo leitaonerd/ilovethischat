@@ -1,0 +1,389 @@
+/* =============================================================
+   Conversa — the chat lives inside a framed "canvas" sheet.
+   Old-style squared boxes & hairline rules, modern minimalist
+   finish (Inter, tight tracking, one highlighter-pink accent).
+   ============================================================= */
+:root {
+  --color-highlighter-pink: #f09cd4;
+  --color-ink: #151515;
+  --color-ink-soft: #6f6f6f;
+  --color-canvas: #f3f3f3;
+  --color-sheet: #fbfbfa;
+  --color-paper: #e5e5e5;
+
+  --font-ui: 'Inter', 'Segoe UI Variable Text', 'Segoe UI', system-ui,
+             -apple-system, Roboto, 'Helvetica Neue', sans-serif;
+
+  --text-body: 17px;
+  --leading-body: 1.35;
+  --tracking-body: -0.2px;
+  --hairline: 1px solid var(--color-ink);
+  --frame-w: 880px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-ui);
+  font-weight: 400;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: var(--leading-body);
+  letter-spacing: var(--tracking-body);
+  font-size: var(--text-body);
+}
+
+button { font-family: inherit; }
+
+/* Squared button — the single button voice of the whole page */
+.btn-square {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink);
+  background: var(--color-sheet);
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+.btn-square:hover { background: var(--color-highlighter-pink); }
+
+/* =============================================================
+   Top bar — search lives here, always visible, outside the canvas
+   ============================================================= */
+.chatbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-canvas);
+  border-bottom: var(--hairline);
+}
+
+.chatbar-search {
+  max-width: var(--frame-w);
+  margin: 0 auto;
+  display: flex;
+  gap: 8px;
+  padding: 10px 16px;
+}
+
+#search-input {
+  flex: 1;
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: var(--tracking-body);
+  color: var(--color-ink);
+  background: var(--color-sheet);
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 8px 12px;
+}
+#search-input:focus { outline: none; background: #ffffff; }
+#search-input::placeholder { color: var(--color-ink-soft); }
+
+/* =============================================================
+   Month jump bar — squared filter buttons, harmonized with frame
+   ============================================================= */
+.months {
+  position: sticky;
+  top: 51px;
+  z-index: 40;
+  max-width: var(--frame-w);
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 16px;
+  background: var(--color-canvas);
+}
+
+.months button {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink);
+  background: transparent;
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+.months button:hover { background: var(--color-paper); }
+.months button.active {
+  background: var(--color-highlighter-pink);
+  border-color: var(--color-ink);
+}
+
+/* =============================================================
+   The canvas — the whole conversation renders on this sheet
+   ============================================================= */
+.timeline {
+  max-width: var(--frame-w);
+  margin: 16px auto 0;
+  background: var(--color-sheet);
+  border: var(--hairline);
+  padding: 24px 28px 48px;
+  min-height: 60vh;
+}
+
+.window { position: relative; }
+
+/* Day separator — hairline ruled band with guaranteed breathing room */
+.day-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 32px 0 20px;
+  padding-top: 6px;
+  border-top: var(--hairline);
+}
+/* Rows that open a day get extra bottom padding so the rule never
+   collides with the message that follows it. */
+.msg .day-rule { margin-bottom: 20px; }
+.day-rule .day-date {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+}
+.day-rule .label-bar {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background: var(--color-highlighter-pink);
+  padding: 1px 6px;
+}
+
+/* Row wrapper for virtual absolute positioning.
+   flow-root prevents children's margins from collapsing out of the row,
+   which would make offsetHeight smaller than the visual height and
+   cause rows to overlap. */
+.row { position: absolute; left: 0; right: 0; display: flow-root; }
+
+/* System messages — full-width ruled band */
+.sys {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink-soft);
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+  padding: 8px 0;
+  margin: 16px 0;
+  text-align: center;
+}
+
+/* Message columns — Rafael left, Amor right */
+.msg { display: flex; margin: 10px 0; }
+.msg.left  { justify-content: flex-start; }
+.msg.right { justify-content: flex-end; }
+
+.msg-inner {
+  max-width: 72%;
+  display: flex;
+  flex-direction: column;
+}
+.msg.right .msg-inner { align-items: flex-end; }
+
+.author {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  margin-bottom: 3px;
+}
+.msg.left  .author { border-left: 3px solid var(--color-ink); padding-left: 6px; }
+.msg.right .author { border-right: 3px solid var(--color-highlighter-pink); padding-right: 6px; }
+
+.bubble {
+  background: var(--color-paper);
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 8px 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.msg.right .bubble { background: #ffffff; }
+
+.msg-time {
+  font-size: 10px;
+  color: var(--color-ink-soft);
+  margin-top: 3px;
+}
+
+/* Media */
+.media img,
+.media video {
+  display: block;
+  max-width: 100%;
+  border-radius: 0;
+  border: var(--hairline);
+  margin-bottom: 4px;
+  /* Reserve vertical space while the file loads, so nothing overlaps;
+     real height is applied on load via re-measure. */
+  min-height: 120px;
+  background: var(--color-paper);
+}
+.media audio { width: 100%; min-width: 240px; }
+.media .sticker img { width: 140px; border: none; min-height: 100px; }
+
+.doc {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink);
+  text-decoration: none;
+  border: var(--hairline);
+  padding: 6px 10px 8px;
+  border-radius: 0;
+  background: var(--color-sheet);
+}
+.doc:hover { background: var(--color-highlighter-pink); }
+
+.media .caption {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  margin-top: 4px;
+}
+
+/* =============================================================
+   Search results panel — outside the canvas, below the top bar
+   ============================================================= */
+.search {
+  max-width: var(--frame-w);
+  margin: 0 auto;
+  padding: 12px 16px;
+}
+
+.search-status {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+}
+
+.search-results {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+.search-results .result {
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 12px;
+  background: var(--color-sheet);
+  cursor: pointer;
+}
+.search-results .result:hover { background: var(--color-highlighter-pink); }
+.search-results .result .source {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  margin-bottom: 4px;
+}
+.search-results .result .body {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.search-results .result .body mark {
+  background: var(--color-highlighter-pink);
+  color: inherit;
+}
+
+.search-back { margin-top: 12px; }
+
+/* =============================================================
+   Load state
+   ============================================================= */
+.load-state {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink-soft);
+  padding: 24px;
+}
+
+/* Thin ink scrollbar */
+::-webkit-scrollbar { width: 10px; }
+::-webkit-scrollbar-thumb { background: var(--color-ink); }
+::-webkit-scrollbar-track { background: var(--color-canvas); }
+
+/* =============================================================
+   Password gate — small barrier, not real security
+   ============================================================= */
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-canvas);
+}
+.gate-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(320px, 86vw);
+  border: var(--hairline);
+  background: var(--color-sheet);
+  padding: 28px 24px;
+}
+.gate-title {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: var(--tracking-body);
+}
+.gate-sub {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink-soft);
+  border-bottom: var(--hairline);
+  padding-bottom: 10px;
+}
+#gate-input {
+  font-family: inherit;
+  font-size: 14px;
+  letter-spacing: var(--tracking-body);
+  color: var(--color-ink);
+  background: var(--color-sheet);
+  border: var(--hairline);
+  border-radius: 0;
+  padding: 8px 12px;
+}
+#gate-input:focus { outline: none; background: #ffffff; }
+.gate-error {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: -0.1px;
+  color: var(--color-ink);
+  background: var(--color-highlighter-pink);
+  padding: 6px 8px;
+}
+
+/* =============================================================
+   Responsive
+   ============================================================= */
+@media (max-width: 640px) {
+  .chatbar-search, .months, .search { padding-left: 10px; padding-right: 10px; }
+  .timeline { margin-top: 10px; padding: 16px 12px 32px; }
+  .msg-inner { max-width: 86%; }
+}

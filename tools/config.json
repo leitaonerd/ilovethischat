@@ -1,0 +1,11 @@
+{
+  "input_txt": "backup/Conversa do WhatsApp com Amor.txt",
+  "media_dir": "backup",
+  "site_dir": "site",
+  "senders": {
+    "Rafael": "Rafael",
+    "Amor 💖": "AMOR 💖"
+  },
+  "search": true,
+  "transcode_opus": false
+}

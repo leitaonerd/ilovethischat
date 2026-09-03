@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Conversa</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <!-- Password gate: blocks the page until unlocked -->
+  <section class="gate" id="gate">
+    <form class="gate-box" id="gate-form" autocomplete="off">
+      <div class="gate-title">SEGREDO</div>
+      <div class="gate-sub">DICA:oi_ _ _ _.</div>
+      <input id="gate-input" type="password" placeholder="SENHA" autofocus>
+      <button class="btn-square" type="submit">ENTRAR</button>
+      <div class="gate-error" id="gate-error" hidden>SENHA ERRADA — TENTA DE NOVO.</div>
+    </form>
+  </section>
+
+  <!-- Top bar: search lives here, always visible, outside the canvas -->
+  <header class="chatbar">
+    <form id="search-form" class="chatbar-search" autocomplete="off">
+      <input id="search-input" type="search" placeholder="BUSCAR NA CONVERSA…">
+      <button class="btn-square" type="submit">BUSCAR</button>
+    </form>
+  </header>
+
+  <!-- Search results panel (outside the canvas, hidden by default) -->
+  <section class="search" id="search-panel" hidden>
+    <div class="search-status" id="search-status"></div>
+    <div class="search-results" id="search-results" hidden></div>
+    <button class="btn-square search-back" id="search-back" hidden>VOLTAR</button>
+  </section>
+
+  <!-- Month jump nav -->
+  <nav class="months" id="months"></nav>
+
+  <!-- The canvas: all chat rendering happens inside this framed sheet -->
+  <main id="timeline" class="timeline">
+    <div id="window" class="window"></div>
+  </main>
+
+  <div class="load-state" id="load-state" hidden>CARREGANDO…</div>
+
+  <script src="assets/app.js"></script>
+</body>
+</html>
