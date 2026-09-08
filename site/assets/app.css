@@ -387,3 +387,111 @@ button { font-family: inherit; }
   .timeline { margin-top: 10px; padding: 16px 12px 32px; }
   .msg-inner { max-width: 86%; }
 }
+
+/* =============================================================
+   Gate Animation State (Added)
+   ============================================================= */
+
+/* 1. Error Shake */
+@keyframes gate-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake { 
+  animation: gate-shake 0.3s ease-in-out; 
+}
+
+/* 2. Success Unlock Glitch/Zoom */
+@keyframes gate-unlock {
+  0% { opacity: 1; transform: scale(1); filter: blur(0); }
+  30% { 
+    background: var(--color-highlighter-pink); 
+    border-color: var(--color-ink);
+    transform: scale(1.02); 
+    filter: blur(0); 
+  }
+  100% { 
+    opacity: 0; 
+    transform: scale(1.2); 
+    filter: blur(8px); 
+  }
+}
+.gate-unlocking .gate-box {
+  animation: gate-unlock 0.5s cubic-bezier(0.8, 0, 0.2, 1) forwards;
+}
+.gate-unlocking {
+  background: transparent;
+  transition: background 1s ease;
+  pointer-events: none; /* Prevents clicks while fading */
+}
+
+/* 3. Staggered reveal for the main chat UI */
+body.animated-entry .chatbar,
+body.animated-entry .months,
+body.animated-entry .timeline {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+body.animated-entry .reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/*final touches */
+/* Pop the main chat canvas off the background */
+.timeline, .search {
+  box-shadow: 4px 4px 0px var(--color-ink);
+}
+
+/* Make buttons feel tactile when hovered */
+.btn-square, .months button {
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-square:hover, .months button:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 3px 3px 0px var(--color-ink);
+}
+
+.months button.active {
+  box-shadow: 3px 3px 0px var(--color-ink);
+  transform: translate(-2px, -2px);
+}
+/* Add a tiny hard shadow to the bubbles */
+.bubble {
+  box-shadow: 2px 2px 0px rgba(21, 21, 21, 0.15); /* Faint ink color */
+}
+
+/* Make the corner pointing to the author perfectly sharp, 
+   and very slightly soften the other three corners */
+.msg.left .bubble { 
+  border-radius: 0 1px 1px 1px; 
+}
+.msg.right .bubble { 
+  border-radius: 1px 0 1px 1px; 
+}
+
+/* =============================================================
+   Single-line Horizontal Scroll for Months Nav
+   ============================================================= */
+.months {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  
+  /* Hides the scrollbar to keep the UI clean, but you can still swipe/scroll it */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hides the scrollbar in Chrome/Safari/Edge */
+.months::-webkit-scrollbar {
+  display: none; 
+}
+
+/* Forces the buttons to maintain their size and not squish together */
+.months button {
+  flex-shrink: 0;
+}

@@ -330,7 +330,7 @@ function buildRowDom(el, row) {
     return;
   }
 
-  const isRight = rec.sender === "AMOR 💖";
+  const isRight = rec.sender === "Mari";
 
   // Day rule is a direct child of the row (NOT inside the flex .msg):
   // inside .msg it gets flexed to the right column and its margins
@@ -722,6 +722,7 @@ async function boot() {
   const gate = $("#gate");
   if (!gate) { init(); return; }
 
+  // If already unlocked in this session, skip the animation
   if (sessionStorage.getItem("unlocked") === "1") {
     gate.remove();
     init();
@@ -735,16 +736,54 @@ async function boot() {
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const hex = await sha256Hex(input.value);
+    
     if (hex === GATE_HASH) {
       sessionStorage.setItem("unlocked", "1");
-      gate.remove();
-      init();
+      
+      // 1. Prepare UI for success
+      error.hidden = true;
+      input.blur(); // Dismiss mobile keyboard
+      
+      // 2. Trigger the Gate unlock animation
+      gate.classList.add("gate-unlocking");
+      
+      // 3. Set the body class to hide the chat components initially
+      document.body.classList.add("animated-entry");
+      
+      // 4. Start booting the app in the background so data is ready
+      init(); 
+
+      // 5. Wait for the gate animation (0.5s) to finish, then clear it and reveal
+      setTimeout(() => {
+        gate.remove();
+        
+        // Stagger the slide-up reveal of the UI components
+        setTimeout(() => $(".chatbar")?.classList.add("reveal"), 250);
+        setTimeout(() => $(".months")?.classList.add("reveal"), 400);
+        setTimeout(() => $(".timeline")?.classList.add("reveal"), 600);
+        
+        // Cleanup the animation classes after the sequence finishes
+        setTimeout(() => {
+          document.body.classList.remove("animated-entry");
+          const elements = document.querySelectorAll('.reveal');
+          elements.forEach(el => el.classList.remove('reveal'));
+        }, 1200);
+        
+      }, 1000); // Matches the 0.5s CSS animation time
+
     } else {
+      // Handle wrong password
       error.hidden = false;
       input.value = "";
       input.focus();
+      
+      // Reset and re-trigger the CSS shake animation
+      form.classList.remove("shake");
+      void form.offsetWidth; // Force DOM reflow
+      form.classList.add("shake");
     }
   });
+  
   input.focus();
 }
 
